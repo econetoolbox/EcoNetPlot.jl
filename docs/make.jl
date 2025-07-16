@@ -3,7 +3,7 @@ using EcologicalNetworksDynamics
 using EcoNetPlot
 
 DocMeta.setdocmeta!(
-    EcoNetPostProcessing,
+    EcoNetPlot,
     :DocTestSetup,
     :(using EcoNetPlot, EcologicalNetworksDynamics);
     recursive=true,
