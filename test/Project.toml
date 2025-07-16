@@ -1,0 +1,4 @@
+[deps]
+EcoNetPlot = "cb759ccd-645c-4f60-9a03-02ab6c6b6960"
+EcologicalNetworksDynamics = "2fd9189a-c387-4076-88b7-22b33b5a4388"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
