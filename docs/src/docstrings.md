@@ -1,5 +1,5 @@
 # Docstrings
 
 ```@autodocs
-Modules = [EcoNetPostProcessing]
+Modules = [EcoNetPlot]
 ```
