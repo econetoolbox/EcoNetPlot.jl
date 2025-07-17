@@ -1,3 +1,0 @@
-var documenterSearchIndex = {"docs":
-[{"location":"index.html#Home","page":"Home","title":"Home","text":"","category":"section"},{"location":"index.html","page":"Home","title":"Home","text":"A companion package to EcologicalNetworksDynamics to plot ecological networks.","category":"page"},{"location":"docstrings.html#Docstrings","page":"Functions","title":"Docstrings","text":"","category":"section"},{"location":"docstrings.html#EcoNetPlot.hello_world-Tuple{}","page":"Functions","title":"EcoNetPlot.hello_world","text":"hello_world()\n\nPoliteness matters.\n\n\n\n\n\n","category":"method"}]
-}
