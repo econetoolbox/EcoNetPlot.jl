@@ -7,6 +7,7 @@ using CairoMakie
 using Graphs
 using UMAP
 using Statistics
+using LinearAlgebra
 
 const END = EcologicalNetworksDynamics
 

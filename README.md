@@ -6,3 +6,11 @@
 A plotting package for ecological networks (food webs and more) powered by [`GraphMakie`](https://github.com/MakieOrg/GraphMakie.jl) 
 and [`UMAP`](https://github.com/dillondaudert/UMAP.jl).
 Direct integration with [`EcologicalNetworksDynamics`](https://github.com/econetoolbox/EcologicalNetworksDynamics.jl).
+
+Install with
+
+```julia
+using Pkg; Pkg.add(url = "https://github.com/econetoolbox/EcoNetPlot.jl")
+```
+
+This package is under active development so feedbacks are more than welcome.

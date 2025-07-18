@@ -21,21 +21,33 @@ using umap embedding, but other options are possible (see `layout`).
   - `tl_axis`: set the axis of the trophic levels, either :x or :y.
   - `kwargs`: keyword argument given to the graphplot function of GraphMakie.
 """
-
-function plot_network(A::AbstractMatrix; layout = :umap, tl_axis = :y, kwargs...)
+function plot_network(
+    A::AbstractMatrix;
+    layout = :umap,
+    tl_axis = :y,
+    A_facilitation = nothing,
+    A_competition = nothing,
+    A_refuge = nothing,
+    A_interference = nothing,
+    edge_width = 1.3,
+    node_size = 20,
+    arrow_size = 10,
+    edge_color = :black,
+    curve_distance = 0.02,
+    kwargs...,
+)
     S = size(A, 1)
     tl = trophic_levels(A)
+    A[diagind(A)] .= 0
     if layout == :random
         embedding = rand(S)
     elseif layout == :umap
         min_dist = 10.0 # Control spacing between points.
-        repulsion_strength = 5
         distance = get_path_distance(A)
         n_neighbors = min(3, S - 1)
         embedding = umap(distance, 2; metric = :precomputed, n_neighbors, min_dist)[1, :]
         embedding .-= mean(embedding)
         embedding ./= var(embedding)
-        @info embedding
     else
         @error "layout should be either :umap or :random."
     end
@@ -52,13 +64,31 @@ function plot_network(A::AbstractMatrix; layout = :umap, tl_axis = :y, kwargs...
     fig, ax, p = graphplot(
         g;
         layout = points,
-        edge_width = 1,
-        node_size = 20,
-        arrow_size = 10,
+        edge_width = edge_width,
+        node_size,
+        arrow_size,
         ilabels,
-        edge_color = :gray,
+        edge_color,
         kwargs...,
     )
+    A_nti_list = [A_facilitation, A_competition, A_refuge, A_interference]
+    color_nti = [:lightgreen, :lightsalmon, :lightblue, :pink]
+    for (A_nti, color) in zip(A_nti_list, color_nti)
+        if !isnothing(A_nti)
+            g_nti = DiGraph(A_nti)
+            graphplot!(
+                ax,
+                g_nti;
+                edge_color = color,
+                layout = points,
+                node_size,
+                edge_width,
+                ilabels,
+                curve_distance_usage = true,
+                curve_distance,
+            )
+        end
+    end
     if tl_axis == :y
         ax.yticks = tlmin:tlmax
     elseif tl_axis == :x
@@ -68,6 +98,7 @@ function plot_network(A::AbstractMatrix; layout = :umap, tl_axis = :y, kwargs...
     hidespines!(ax)
     fig
 end
+
 
 """
     plot_network(fw::END.Foodweb; kwargs...)
@@ -84,7 +115,25 @@ plot_network(fw::END.Foodweb_.Adjacency; kwargs...) =
 
 Plotting directly from a Model object of EcologicalNetworksDynamics.
 """
-plot_network(m::END.Model; kwargs...) = plot_network(m.A; kwargs...)
+function plot_network(m::END.Model; kwargs...)
+    A_dict = Dict()
+    nti_list = setdiff(m.topology.edge_types_labels, [:trophic])
+    for nti in nti_list
+        A_dict[nti] = getproperty(m, nti).links.matrix
+    end
+    A_facilitation = haskey(A_dict, :facilitation) ? A_dict[:facilitation] : nothing
+    A_interference = haskey(A_dict, :interference) ? A_dict[:interference] : nothing
+    A_refuge = haskey(A_dict, :refuge) ? A_dict[:refuge] : nothing
+    A_competition = haskey(A_dict, :competition) ? A_dict[:competition] : nothing
+    plot_network(
+        Matrix(m.A);
+        A_facilitation,
+        A_interference,
+        A_refuge,
+        A_competition,
+        kwargs...,
+    )
+end
 export plot_network
 
 """
@@ -100,16 +149,12 @@ function spread_points(vec; min_dist = 0.015)
         D = distance_matrix(x[tl_ind])
         while minimum(D) < min_dist
             idx_list = findall(<(min_dist), D)
-            @info idx_list
             for idx in idx_list
                 i, j = Tuple(idx)
-                @info (i, j)
                 if x[tl_ind[i]] <= x[tl_ind[j]]
                     x[tl_ind[i]] -= min_dist / 4
                     x[tl_ind[j]] += min_dist / 4
-                    @info (i, j)
                 end
-                @info x[tl_ind]
             end
             D = distance_matrix(x[tl_ind])
         end

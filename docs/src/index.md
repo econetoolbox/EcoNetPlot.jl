@@ -75,3 +75,26 @@ using EcologicalNetworksDynamics
 fw = Foodweb(:niche; S = 10, C = 0.1, reject_cycles = true)
 plot_network(fw)
 ```
+
+
+Not that non-trophic interactions are also supported.
+
+```@example doc
+fw = Foodweb(:niche; S = 15, C = 0.1, reject_cycles = true)
+nti = NontrophicLayers(;
+    :facilitation => (; C = 0.1),
+    :interference => (; C = 0.1),
+    :refuge => (; C = 0.1),
+    :competition => (; C = 0.1),
+)
+m = default_model(fw, nti)
+plot_network(m)
+```
+
+Here is the correspondence of the different colours:
+- green: facilitation for recruitment
+- blue: refuge provisioning
+- pink: interference between predators
+- light red: competition for space.
+
+For more details please see the [documentation](https://econetoolbox.github.io/EcologicalNetworksDynamics.jl/) of EcologicalNetworksDynamics.
