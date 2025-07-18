@@ -4,9 +4,19 @@ A plotting package for ecological networks (food webs and more) powered by [`Gra
 and [`UMAP`](https://github.com/dillondaudert/UMAP.jl).
 Direct integration with [`EcologicalNetworksDynamics`](https://github.com/econetoolbox/EcologicalNetworksDynamics.jl).
 
+### Installation
+
+Install with
+
+```julia
+using Pkg; Pkg.add(url = "https://github.com/econetoolbox/EcoNetPlot.jl")
+```
+```
+```
+
 ### Plotting from an adjacency matrix
 
-Let's say that you have an adjacency matrix which represent an ecological networks, say, a food web.
+You have an adjacency matrix which represents an ecological networks, say, a food web.
 Elements `A[i,j] = 1` means that species i
 eats species j.
 Adjacency matrix are useful tool to encode networks, but they are not very visual.
