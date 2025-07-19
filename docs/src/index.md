@@ -9,10 +9,9 @@ Direct integration with [`EcologicalNetworksDynamics`](https://github.com/econet
 Install with
 
 ```julia
-using Pkg; Pkg.add(url = "https://github.com/econetoolbox/EcoNetPlot.jl");
+using Pkg; Pkg.add(url = "https://github.com/econetoolbox/EcoNetPlot.jl")
 ```
-```
-```
+
 
 ### Plotting from an adjacency matrix
 
