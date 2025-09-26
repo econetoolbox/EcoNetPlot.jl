@@ -1,7 +1,7 @@
 name = "EcoNetPlot"
 uuid = "cb759ccd-645c-4f60-9a03-02ab6c6b6960"
 authors = ["Ismaël Lajaaiti <ismael.lajaaiti@gmail.com>"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
