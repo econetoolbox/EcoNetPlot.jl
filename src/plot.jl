@@ -119,7 +119,7 @@ function plot_network(m::END.Model; kwargs...)
     A_dict = Dict()
     nti_list = setdiff(m.topology.edge_types_labels, [:trophic])
     for nti in nti_list
-        A_dict[nti] = getproperty(m, nti).links.matrix
+        A_dict[nti] = get_matrix(m, nti)
     end
     A_facilitation = haskey(A_dict, :facilitation) ? A_dict[:facilitation] : nothing
     A_interference = haskey(A_dict, :interference) ? A_dict[:interference] : nothing
@@ -135,6 +135,16 @@ function plot_network(m::END.Model; kwargs...)
     )
 end
 export plot_network
+
+function get_matrix(m, label)
+    if label == :producers_competition
+        res = m.producers.competition.matrix |> collect
+    else
+        res = getproperty(m, label).links.matrix
+    end
+    @info res
+    res
+end
 
 """
     spread_points(vec; min_dist = 0.015)
