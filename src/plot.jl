@@ -29,14 +29,15 @@ function plot_network(
     A_competition = nothing,
     A_refuge = nothing,
     A_interference = nothing,
-    edge_width = 1.3,
-    node_size = 20,
+    edge_width = 0.5 / log10(sum(A)),
+    node_size = 15 / log10(size(A, 1)),
     arrow_size = 10,
-    edge_color = :black,
+    edge_color = :grey,
     curve_distance = 0.02,
     kwargs...,
 )
     S = size(A, 1)
+    S > 20 && (arrow_size = 0)
     tl = trophic_levels(A)
     A[diagind(A)] .= 0
     if layout == :random
@@ -60,7 +61,7 @@ function plot_network(
     end
     tlmin, tlmax = extrema(tl)
     g = SimpleDiGraph(A)
-    ilabels = ["$i" for i in 1:S]
+    ilabels = S > 20 ? ["" for i in 1:S] : ["$i" for i in 1:S]
     fig, ax, p = graphplot(
         g;
         layout = points,
@@ -72,7 +73,7 @@ function plot_network(
         kwargs...,
     )
     A_nti_list = [A_facilitation, A_competition, A_refuge, A_interference]
-    color_nti = [:lightgreen, :lightsalmon, :lightblue, :pink]
+    color_nti = [:green, :red, :lightblue, :pink]
     for (A_nti, color) in zip(A_nti_list, color_nti)
         if !isnothing(A_nti)
             g_nti = DiGraph(A_nti)
@@ -83,6 +84,7 @@ function plot_network(
                 layout = points,
                 node_size,
                 edge_width,
+                arrow_size,
                 ilabels,
                 curve_distance_usage = true,
                 curve_distance,
@@ -142,7 +144,6 @@ function get_matrix(m, label)
     else
         res = getproperty(m, label).links.matrix
     end
-    @info res
     res
 end
 

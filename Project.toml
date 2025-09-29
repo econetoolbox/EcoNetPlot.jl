@@ -4,7 +4,9 @@ authors = ["Ismaël Lajaaiti <ismael.lajaaiti@gmail.com>"]
 version = "0.1.1"
 
 [deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 EcologicalNetworksDynamics = "2fd9189a-c387-4076-88b7-22b33b5a4388"
 GraphMakie = "1ecd5474-83a3-4783-bb4f-06765db800d2"
 Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
@@ -13,7 +15,9 @@ Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 UMAP = "c4f8c510-2410-5be4-91d7-4fbaeb39457e"
 
 [compat]
+CSV = "0.10.15"
 CairoMakie = "0.15.3"
+DataFrames = "1.8.0"
 EcologicalNetworksDynamics = "0.3.0"
 GraphMakie = "0.6.0"
 Graphs = "1.13.0"
