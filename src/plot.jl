@@ -24,20 +24,73 @@ using umap embedding, but other options are possible (see `layout`).
 function plot_network(
     A::AbstractMatrix;
     layout = :umap,
+    custom_layout = nothing,
     tl_axis = :y,
     A_facilitation = nothing,
     A_competition = nothing,
     A_refuge = nothing,
     A_interference = nothing,
-    edge_width = 0.5 / log10(sum(A)),
-    node_size = 15 / log10(size(A, 1)),
+    edge_width = 1,
+    node_size = 10 / log10(size(A, 1)),
+    node_color = :darkslategray,
     arrow_size = 10,
-    edge_color = :grey,
+    edge_color = :tan,
     curve_distance = 0.02,
     kwargs...,
 )
     S = size(A, 1)
     S > 20 && (arrow_size = 0)
+    if layout == :custom
+        points = custom_layout
+    else
+        points = get_layout(A; layout, tl_axis)
+    end
+    g = SimpleDiGraph(A)
+    ilabels = S > 20 ? ["" for i in 1:S] : ["$i" for i in 1:S]
+    A_list = [A, A_facilitation, A_competition, A_refuge, A_interference]
+    A_list = [x for x in A_list if !isnothing(x)]
+    degree = get_degree(A_list...)
+    node_size = node_size .* (0.1 .+ log10.(1 .+ degree))
+    fig, ax, p = graphplot(
+        g;
+        layout = points,
+        edge_width = edge_width / log10(sum(A)),
+        node_size,
+        arrow_size,
+        ilabels,
+        edge_color,
+        node_color,
+        curve_distance_usage = true,
+        curve_distance,
+        kwargs...,
+    )
+    A_nti_list = [A_facilitation, A_competition, A_refuge, A_interference]
+    color_nti = [:lightgreen, :salmon, :lightblue, :pink]
+    for (A_nti, color) in zip(A_nti_list, color_nti)
+        if !isnothing(A_nti)
+            g_nti = DiGraph(A_nti)
+            graphplot!(
+                ax,
+                g_nti;
+                edge_color = color,
+                node_color,
+                layout = points,
+                node_size,
+                edge_width = edge_width / log10(sum(A_nti)),
+                arrow_size,
+                ilabels,
+                curve_distance_usage = true,
+                curve_distance,
+            )
+        end
+    end
+    hidexdecorations!(ax)
+    hidespines!(ax)
+    fig
+end
+
+function get_layout(A; layout = :umap, tl_axis = :y)
+    S = size(A, 1)
     tl = trophic_levels(A)
     A[diagind(A)] .= 0
     if layout == :random
@@ -59,48 +112,16 @@ function plot_network(
     elseif tl_axis != :y
         @error "tl_axis should be either :x or :y."
     end
-    tlmin, tlmax = extrema(tl)
-    g = SimpleDiGraph(A)
-    ilabels = S > 20 ? ["" for i in 1:S] : ["$i" for i in 1:S]
-    fig, ax, p = graphplot(
-        g;
-        layout = points,
-        edge_width = edge_width,
-        node_size,
-        arrow_size,
-        ilabels,
-        edge_color,
-        kwargs...,
-    )
-    A_nti_list = [A_facilitation, A_competition, A_refuge, A_interference]
-    color_nti = [:green, :red, :lightblue, :pink]
-    for (A_nti, color) in zip(A_nti_list, color_nti)
-        if !isnothing(A_nti)
-            g_nti = DiGraph(A_nti)
-            graphplot!(
-                ax,
-                g_nti;
-                edge_color = color,
-                layout = points,
-                node_size,
-                edge_width,
-                arrow_size,
-                ilabels,
-                curve_distance_usage = true,
-                curve_distance,
-            )
-        end
-    end
-    if tl_axis == :y
-        ax.yticks = tlmin:tlmax
-    elseif tl_axis == :x
-        ax.xticks = tlmin:tlmax
-    end
-    hidexdecorations!(ax)
-    hidespines!(ax)
-    fig
+    points
 end
+export get_layout
 
+function get_degree(args...)
+    A_tot = sum(args)
+    degree = vec(sum(A_tot; dims = 1)) .+ vec(sum(A_tot; dims = 2))
+    degree
+end
+export get_degree
 
 """
     plot_network(fw::END.Foodweb; kwargs...)
@@ -155,8 +176,13 @@ Space points so they do not overlap.
 function spread_points(vec; min_dist = 0.015)
     x = [p[1] for p in vec]
     tl = [p[2] for p in vec]
-    for tl_val in sort(unique(tl))
-        tl_ind = findall(==(tl_val), tl)
+    tl_min, tl_max = extrema(tl)
+    tl_range = collect(tl_min:3min_dist:tl_max)
+    n = length(tl_range)
+    for i in 1:n-1
+        in_interval(x) = tl_range[i] <= x < tl_range[i+1]
+        tl_ind = findall(in_interval, tl)
+        isempty(tl_ind) && continue
         D = distance_matrix(x[tl_ind])
         while minimum(D) < min_dist
             idx_list = findall(<(min_dist), D)
