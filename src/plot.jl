@@ -32,7 +32,7 @@ function plot_network!(
     A_refuge = nothing,
     A_interference = nothing,
     edge_width = 1,
-    node_size = 30 / 2log10(size(A, 1)),
+    node_size = 40 / 3log10(size(A, 1)),
     node_color = :slategray,
     arrow_size = 10,
     edge_color = :sienna,
@@ -51,7 +51,7 @@ function plot_network!(
     A_list = [A, A_facilitation, A_competition, A_refuge, A_interference]
     A_list = [x for x in A_list if !isnothing(x)]
     degree = get_degree(A_list...)
-    node_size = node_size .* (0.4 .+ 0.8log10.(1 .+ degree))
+    node_size = node_size .* (1.3 .+ 0.5log10.(0.5 .+ degree))
     graphplot!(
         ax,
         g;
@@ -99,6 +99,13 @@ function plot_network(A; kwargs...)
     fig
 end
 
+"""
+    get_layout(A; layout = :umap, tl_axis = :y)
+
+Return the node layout, which is a vector of Points.
+Typically useful when one wants to use the same layout for several plots
+(e.g. same node positions, but different interactions represented).
+"""
 function get_layout(A; layout = :umap, tl_axis = :y)
     S = size(A, 1)
     tl = trophic_levels(A)

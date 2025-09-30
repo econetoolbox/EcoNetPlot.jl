@@ -46,8 +46,6 @@ the main goal of the package.
 But plotting can be performed on more complex networks.
 For example, we can add predators feeding on herbivores in the previous network.
 
-```@example doc
-```
 Interestingly, we can see that two energy channels are well-separated
 thanks to the UMAP embedding.
 
@@ -106,7 +104,7 @@ and plot each interaction type in a separate subplot.
 ```@example doc
 using CairoMakie
 
-fig = Figure(; size = (1_000, 400));
+fig = Figure(; size = (1_200, 500));
 ax1 = Axis(fig[1, 1], title = "trophic") 
 ax2 = Axis(fig[1, 2], title = "non-trophic positive") 
 ax3 = Axis(fig[1, 3], title = "non-trophic negative") 
@@ -116,3 +114,4 @@ plot_network!(ax2, chilean_web[:positive]; layout = :custom, custom_layout, edge
 plot_network!(ax3, chilean_web[:negative]; layout = :custom, custom_layout, edge_color = :salmon)
 fig
 ```
+
