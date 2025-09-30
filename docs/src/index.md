@@ -31,9 +31,11 @@ Random.seed!(123) #hide
 using EcoNetPlot
 
 A = [
-    0 0 0 # Producer (1).
-    1 0 0 # Hervibore (2).
-    1 0 0 # Herbivore (3).
+    0 0 0 0 0
+    1 0 0 0 0
+    1 0 0 0 0
+    0 1 0 0 0 # Predator eating herbivore 2.
+    0 0 1 0 0 # Predator eating herbivore 3.
 ]
 plot_network(A)
 ```
@@ -45,30 +47,7 @@ But plotting can be performed on more complex networks.
 For example, we can add predators feeding on herbivores in the previous network.
 
 ```@example doc
-A = [
-    0 0 0 0 0
-    1 0 0 0 0
-    1 0 0 0 0
-    0 1 0 0 0 # Predator eating herbivore 2.
-    0 0 1 0 0 # Predator eating herbivore 3.
-]
-plot_network(A)
 ```
-
-We can further add a top predator that feed on the herbivore's predators.
-
-```@example doc
-A = [
-    0 0 0 0 0 0
-    1 0 0 0 0 0
-    1 0 0 0 0 0
-    0 1 0 0 0 0
-    0 0 1 0 0 0
-    0 0 0 1 1 0 # Adding top predator.
-]
-plot_network(A)
-```
-
 Interestingly, we can see that two energy channels are well-separated
 thanks to the UMAP embedding.
 
@@ -107,3 +86,33 @@ Here is the correspondence of the different colours:
 - light red: competition for space.
 
 For more details please see the [documentation](https://econetoolbox.github.io/EcologicalNetworksDynamics.jl/) of EcologicalNetworksDynamics.
+
+### Plotting the chilean web
+
+Let's plot an empirical network.
+The chilean web from [Kéfi et al., Ecology (2015)](https://doi.org/10.1890/13-1424.1)
+is directly available within our package with
+
+```@example doc
+chilean_web = EcoNetPlot.get_chilean_web()
+```
+
+
+Now let's plot a more complex figure.
+We will use the same layout given by [`get_layout`](@ref),
+and plot each interaction type in a separate subplot.
+
+
+```@example doc
+using CairoMakie
+
+fig = Figure(; size = (1_000, 400));
+ax1 = Axis(fig[1, 1], title = "trophic") 
+ax2 = Axis(fig[1, 2], title = "non-trophic positive") 
+ax3 = Axis(fig[1, 3], title = "non-trophic negative") 
+custom_layout = get_layout(chilean_web[:trophic])
+plot_network!(ax1, chilean_web[:trophic]; layout = :custom, custom_layout)
+plot_network!(ax2, chilean_web[:positive]; layout = :custom, custom_layout, edge_color = :lightgreen)
+plot_network!(ax3, chilean_web[:negative]; layout = :custom, custom_layout, edge_color = :salmon)
+fig
+```

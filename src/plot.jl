@@ -21,7 +21,8 @@ using umap embedding, but other options are possible (see `layout`).
   - `tl_axis`: set the axis of the trophic levels, either :x or :y.
   - `kwargs`: keyword argument given to the graphplot function of GraphMakie.
 """
-function plot_network(
+function plot_network!(
+    ax,
     A::AbstractMatrix;
     layout = :umap,
     custom_layout = nothing,
@@ -31,11 +32,11 @@ function plot_network(
     A_refuge = nothing,
     A_interference = nothing,
     edge_width = 1,
-    node_size = 10 / log10(size(A, 1)),
-    node_color = :darkslategray,
+    node_size = 30 / 2log10(size(A, 1)),
+    node_color = :slategray,
     arrow_size = 10,
-    edge_color = :tan,
-    curve_distance = 0.02,
+    edge_color = :sienna,
+    curve_distance = 0.01,
     kwargs...,
 )
     S = size(A, 1)
@@ -50,8 +51,9 @@ function plot_network(
     A_list = [A, A_facilitation, A_competition, A_refuge, A_interference]
     A_list = [x for x in A_list if !isnothing(x)]
     degree = get_degree(A_list...)
-    node_size = node_size .* (0.1 .+ log10.(1 .+ degree))
-    fig, ax, p = graphplot(
+    node_size = node_size .* (0.4 .+ 0.8log10.(1 .+ degree))
+    graphplot!(
+        ax,
         g;
         layout = points,
         edge_width = edge_width / log10(sum(A)),
@@ -80,12 +82,20 @@ function plot_network(
                 arrow_size,
                 ilabels,
                 curve_distance_usage = true,
-                curve_distance,
+                curve_distance = 2curve_distance,
             )
         end
     end
     hidexdecorations!(ax)
     hidespines!(ax)
+    # fig
+end
+export plot_network!
+
+function plot_network(A; kwargs...)
+    fig = Figure()
+    ax = Axis(fig[1, 1])
+    plot_network!(ax, A; kwargs...)
     fig
 end
 
@@ -118,7 +128,7 @@ export get_layout
 
 function get_degree(args...)
     A_tot = sum(args)
-    degree = vec(sum(A_tot; dims = 1)) .+ vec(sum(A_tot; dims = 2))
+    degree = vec(sum(A_tot; dims = 1)) .+ vec(sum(A_tot; dims = 2)) / sum(A_tot)
     degree
 end
 export get_degree
